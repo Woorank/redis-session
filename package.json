@@ -1,0 +1,38 @@
+{
+  "name": "redis-session",
+  "version": "0.0.1",
+  "description": "Verifies session cookies for authentication status.",
+  "keywords": [
+    "redis",
+    "session",
+    "sessions",
+    "phpsessid",
+    "authentication"
+  ],
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "npm run lint && npm run mocha",
+    "mocha": "mocha -R spec ./test",
+    "lint": "semistandard --verbose | snazzy"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "php-unserialize": "~0.0.1"
+  },
+  "devDependencies": {
+    "bluebird": "~3.3.1",
+    "chai": "~3.5.0",
+    "mocha": "~2.4.5",
+    "semistandard": "~7.0.5",
+    "snazzy": "~2.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Woorank/redis-session.git"
+  },
+  "author": "Mickael van der Beek (https://github.com/Mickael-van-der-Beek)",
+  "bugs": {
+    "url": "https://github.com/Woorank/redis-session/issues"
+  },
+  "homepage": "https://github.com/Woorank/redis-session"
+}
