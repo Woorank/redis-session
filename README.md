@@ -12,5 +12,5 @@ $ npm install Woorank/redis-session
 
 TODO
 
-[circle-image]: https://circleci.com/gh/Woorank/redis-session.svg
+[circle-image]: https://circleci.com/gh/Woorank/redis-session.svg?circle-token=5fc98db531423b8b2d337b87e2d57dac1d7fa21f
 [circle-url]: https://circleci.com/gh/Woorank/redis-session
