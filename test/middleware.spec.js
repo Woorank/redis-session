@@ -46,96 +46,11 @@ describe('HTTP Request serializer', function () {
     });
   });
 
-  describe('Overridable success and error handlers', function () {
-    it('possible to specify custom errorHandler', function (done) {
-      redisSession
-        .middleware({
-          getAsync: function () {
-            return Promise.reject(
-              new Error('test')
-            );
-          }
-        }, {
-          errorHandler: function (err) {
-            assert.instanceOf(err, Error);
-            assert.equal(err.message, 'test');
-
-            done(null);
-          }
-        })({
-          cookies: {
-            PHPSESSID: 'test'
-          }
-        });
-    });
-
-    it('possible to specify custom successHandler', function (done) {
-      redisSession
-        .middleware({
-          getAsync: function () {
-            return Promise.resolve('a:1:{s:2:"id";s:4:"test";}');
-          }
-        }, {
-          successHandler: function (sessionId, session) {
-            assert.typeOf(sessionId, 'string');
-            assert.typeOf(session, 'object');
-            assert.equal(sessionId, session.id);
-
-            done(null);
-          },
-          errorHandler: function (err) {
-            console.log(err.stack);
-          }
-        })({
-          cookies: {
-            PHPSESSID: 'test'
-          }
-        });
-    });
-  });
-
   describe('Intermediate result validation', function () {
-    it('does not throw if cookie parsing middleware doesn\'t exist', function () {
+    it('does not throw if cookie parsing or query middlewares don\'t exist', function (done) {
       assert.doesNotThrow(
         function () {
-          redisSession
-            .middleware(
-              {}, {
-                errorHandler: function () {}
-              }
-            )({});
-        }
-      );
-    });
-
-    it('fail if `PHPSESSID` cookie doesn\'t exists', function (done) {
-      redisSession
-        .middleware(
-          {}, {
-            errorHandler: function (err) {
-              assert.instanceOf(err, ReferenceError);
-              assert.equal(
-                err.message,
-                'Variable `sessionId` is expected to be of type `String` and non-empty.'
-              );
-
-              done(null);
-            }
-          }
-        )({
-          cookies: {}
-        });
-    });
-
-    it('does not throw if query parsing middleware doesn\'t exist', function () {
-      assert.doesNotThrow(
-        function () {
-          redisSession
-            .middleware(
-              {}, {
-                errorHandler: function () {}
-              }
-            )({});
+          redisSession.middleware({})({}, null, done);
         }
       );
     });
@@ -148,41 +63,29 @@ describe('HTTP Request serializer', function () {
               new Error('test')
             );
           }
-        }, {
-          errorHandler: function (err) {
-            assert.instanceOf(err, Error);
-            assert.equal(err.message, 'test');
-
-            done(null);
-          }
         })({
           query: {
-            sessid: 'test'
+            sessid: 'hello'
           }
+        }, null, function (err) {
+          assert.instanceOf(err, Error);
+          assert.equal(err.message, 'test');
+
+          done(null);
         });
     });
 
-    it('fail if `serializedSession` has invalid type', function (done) {
+    it('don\'t fail if `serializedSession` has invalid type', function (done) {
       redisSession
         .middleware({
           getAsync: function () {
             return Promise.resolve(1);
           }
-        }, {
-          errorHandler: function (err) {
-            assert.instanceOf(err, TypeError);
-            assert.equal(
-              err.message,
-              'Variable `serializedSession` is expected to be of type `String` and non-empty.'
-            );
-
-            done(null);
-          }
         })({
           cookies: {
             PHPSESSID: 'test'
           }
-        });
+        }, null, done);
     });
 
     it('fail if `serializedSession` is invalid PHP session', function (done) {
@@ -191,39 +94,35 @@ describe('HTTP Request serializer', function () {
           getAsync: function () {
             return Promise.resolve('test');
           }
-        }, {
-          errorHandler: function (err) {
-            assert.instanceOf(err, Error);
-
-            done(null);
-          }
         })({
           cookies: {
             PHPSESSID: 'test'
           }
+        }, null, function (err) {
+          assert.instanceOf(err, Error);
+
+          done(null);
         });
     });
 
-    it('fail if `session.is` is invalid', function (done) {
+    it('fail if `session.id` is invalid', function (done) {
       redisSession
         .middleware({
           getAsync: function () {
             return Promise.resolve('a:1:{s:2:"id";i:42;}');
           }
-        }, {
-          errorHandler: function (err) {
-            assert.instanceOf(err, TypeError);
-            assert.equal(
-              err.message,
-              'Variable `session.id` is expected to be of type `String` and non-empty.'
-            );
-
-            done(null);
-          }
         })({
           cookies: {
             PHPSESSID: 'test'
           }
+        }, null, function (err) {
+          assert.instanceOf(err, TypeError);
+          assert.equal(
+            err.message,
+            'Variable `session.id` is expected to be of type `String` and non-empty.'
+          );
+
+          done(null);
         });
     });
   });
