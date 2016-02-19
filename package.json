@@ -1,5 +1,5 @@
 {
-  "name": "redis-session",
+  "name": "@woorank/redis-session",
   "version": "0.0.4",
   "description": "Verifies session cookies for authentication status.",
   "keywords": [
