@@ -105,11 +105,11 @@ describe('HTTP Request serializer', function () {
         });
     });
 
-    it('fail if `session.id` is invalid', function (done) {
+    it('fail if `session.id` is missing or invalid', function (done) {
       redisSession
         .middleware({
           getAsync: function () {
-            return Promise.resolve('a:1:{s:2:"id";i:42;}');
+            return Promise.resolve('username|s:16:"test@woorank.com";');
           }
         })({
           cookies: {
@@ -121,6 +121,40 @@ describe('HTTP Request serializer', function () {
             err.message,
             'Variable `session.id` is expected to be of type `String` and non-empty.'
           );
+
+          done(null);
+        });
+    });
+
+    it('success if `session.id` is present', function (done) {
+      var username = 'test@woorank.com';
+      var id = 42;
+
+      var req = {
+        cookies: {
+          PHPSESSID: 'test'
+        }
+      };
+
+      redisSession
+        .middleware({
+          getAsync: function () {
+            return Promise.resolve([
+              'id|i:',
+              id,
+              ';',
+              'username|s:',
+              username.length,
+              ':"',
+              username,
+              '";'
+            ].join(''));
+          }
+        })(req, null, function (err) {
+          assert.equal(err, null);
+          assert.equal(req.sessionId, id);
+          assert.equal(req.session.id, id);
+          assert.equal(req.session.username, username);
 
           done(null);
         });
