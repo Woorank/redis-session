@@ -105,22 +105,31 @@ describe('HTTP Request serializer', function () {
         });
     });
 
-    it('fail if `session.id` is missing or invalid', function (done) {
+    it('set `session.id` to null if is missing or invalid', function (done) {
+      var username = 'test@woorank.com';
+
+      var req = {
+        cookies: {
+          PHPSESSID: 'test'
+        }
+      };
+
       redisSession
         .middleware({
           getAsync: function () {
-            return Promise.resolve('username|s:16:"test@woorank.com";');
+            return Promise.resolve([
+              'username|s:',
+              username.length,
+              ':"',
+              username,
+              '";'
+            ].join(''));
           }
-        })({
-          cookies: {
-            PHPSESSID: 'test'
-          }
-        }, null, function (err) {
-          assert.instanceOf(err, TypeError);
-          assert.equal(
-            err.message,
-            'Variable `session.id` is expected to be of type `String` and non-empty.'
-          );
+        })(req, null, function (err) {
+          assert.equal(err, null);
+          assert.equal(req.sessionId, null);
+          assert.equal(req.session.id, null);
+          assert.equal(req.session.username, username);
 
           done(null);
         });
