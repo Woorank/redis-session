@@ -2,8 +2,7 @@
 
 'use strict';
 
-var Promise = require('bluebird');
-var assert = require('chai').assert;
+var assert = require('assert');
 
 var redisSession = require('../lib/index');
 
@@ -68,8 +67,8 @@ describe('HTTP Request serializer', function () {
             sessid: 'hello'
           }
         }, null, function (err) {
-          assert.instanceOf(err, Error);
-          assert.equal(err.message, 'test');
+          assert.strictEqual(err instanceof Error, true);
+          assert.strictEqual(err.message, 'test');
 
           done(null);
         });
@@ -99,7 +98,7 @@ describe('HTTP Request serializer', function () {
             PHPSESSID: 'test'
           }
         }, null, function (err) {
-          assert.instanceOf(err, Error);
+          assert.strictEqual(err instanceof Error, true);
 
           done(null);
         });
@@ -126,10 +125,10 @@ describe('HTTP Request serializer', function () {
             ].join(''));
           }
         })(req, null, function (err) {
-          assert.equal(err, null);
-          assert.equal(req.sessionId, null);
-          assert.equal(req.session.id, null);
-          assert.equal(req.session.username, username);
+          assert.strictEqual(err, null);
+          assert.strictEqual(req.sessionId, null);
+          assert.strictEqual(req.session.id, null);
+          assert.strictEqual(req.session.username, username);
 
           done(null);
         });
@@ -160,10 +159,10 @@ describe('HTTP Request serializer', function () {
             ].join(''));
           }
         })(req, null, function (err) {
-          assert.equal(err, null);
-          assert.equal(req.sessionId, id);
-          assert.equal(req.session.id, id);
-          assert.equal(req.session.username, username);
+          assert.strictEqual(err, null);
+          assert.strictEqual(req.sessionId, id);
+          assert.strictEqual(req.session.id, id);
+          assert.strictEqual(req.session.username, username);
 
           done(null);
         });
